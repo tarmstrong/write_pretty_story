@@ -62,7 +62,6 @@ requestTitle = () ->
   showTitleRequest()
 
 onReady = () ->
-  console.log('ready')
   $('#write-form').submit(onSubmit)
   $('#writebox textarea').keypress(onkeypress)
   requestTitle()
