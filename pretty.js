@@ -75,7 +75,7 @@
     $('#write-form').submit(onSubmit);
     $('#writebox textarea').keypress(onkeypress);
     requestTitle();
-    return titleTextBox().keypress(function() {
+    return titleTextBox().keypress(function(event) {
       if (event.which === 13) {
         return getTitle();
       }

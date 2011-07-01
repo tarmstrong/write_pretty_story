@@ -65,7 +65,7 @@ onReady = () ->
   $('#write-form').submit(onSubmit)
   $('#writebox textarea').keypress(onkeypress)
   requestTitle()
-  titleTextBox().keypress(() ->
+  titleTextBox().keypress((event) ->
     if event.which is 13
       getTitle()
   )
