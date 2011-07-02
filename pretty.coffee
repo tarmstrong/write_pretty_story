@@ -65,13 +65,14 @@ getTitle = () ->
   titleInput = titleTextBox()
   title = titleInput.val()
   mainText.setTitle(title)
-  hideTitleRequest()
-  mainText.clear()
-  mainText.show()
 
 requestTitle = () ->
   mainText.hide()
   showTitleRequest()
+
+clearStory = () ->
+  localStorage.removeItem('title')
+  localStorage.removeItem('paragraphs')
 
 saveStory = () ->
   localStorage['title'] = $('h1.story-title').html()
@@ -93,10 +94,17 @@ savedStoryExists = () ->
   localStorage? and (localStorage['paragraphs']? or localStorage['title']?)
 
 newStory = () ->
+  if Modernizr.localstorage
+    clearStory()
   requestTitle()
   titleTextBox().keyup((event) ->
     if event.which is 13
       getTitle()
+      hideTitleRequest()
+      mainText.clear()
+      mainText.show()
+      if Modernizr.localstorage
+        saveStory()
   )
 
 onReady = () ->

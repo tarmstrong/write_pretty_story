@@ -1,5 +1,5 @@
 (function() {
-  var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, titleTextBox;
+  var clearStory, filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, titleTextBox;
   filterText = function(text) {
     var filteredText, paragraphs;
     filteredText = text;
@@ -78,14 +78,15 @@
     var title, titleInput;
     titleInput = titleTextBox();
     title = titleInput.val();
-    mainText.setTitle(title);
-    hideTitleRequest();
-    mainText.clear();
-    return mainText.show();
+    return mainText.setTitle(title);
   };
   requestTitle = function() {
     mainText.hide();
     return showTitleRequest();
+  };
+  clearStory = function() {
+    localStorage.removeItem('title');
+    return localStorage.removeItem('paragraphs');
   };
   saveStory = function() {
     var paragraphs;
@@ -110,10 +111,19 @@
     return (typeof localStorage !== "undefined" && localStorage !== null) && ((localStorage['paragraphs'] != null) || (localStorage['title'] != null));
   };
   newStory = function() {
+    if (Modernizr.localstorage) {
+      clearStory();
+    }
     requestTitle();
     return titleTextBox().keyup(function(event) {
       if (event.which === 13) {
-        return getTitle();
+        getTitle();
+        hideTitleRequest();
+        mainText.clear();
+        mainText.show();
+        if (Modernizr.localstorage) {
+          return saveStory();
+        }
       }
     });
   };
