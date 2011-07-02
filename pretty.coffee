@@ -21,7 +21,7 @@ makeNewParagraph = () ->
   formatNewParagraph(text)
   textarea.val('')
 
-onkeypress = (event) ->
+onEnter = (event) ->
   if event.which is 13
     $('#write-form').submit()
 
@@ -63,9 +63,9 @@ requestTitle = () ->
 
 onReady = () ->
   $('#write-form').submit(onSubmit)
-  $('#writebox textarea').keypress(onkeypress)
+  $('#writebox textarea').keyup(onEnter)
   requestTitle()
-  titleTextBox().keypress((event) ->
+  titleTextBox().keyup((event) ->
     if event.which is 13
       getTitle()
   )

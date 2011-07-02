@@ -1,5 +1,5 @@
 (function() {
-  var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, onReady, onSubmit, onkeypress, requestTitle, showTitleRequest, titleTextBox;
+  var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, onEnter, onReady, onSubmit, requestTitle, showTitleRequest, titleTextBox;
   filterText = function(text) {
     var filteredText, paragraphs;
     filteredText = text.replace('--', '&mdash;');
@@ -25,7 +25,7 @@
     formatNewParagraph(text);
     return textarea.val('');
   };
-  onkeypress = function(event) {
+  onEnter = function(event) {
     if (event.which === 13) {
       return $('#write-form').submit();
     }
@@ -73,9 +73,9 @@
   };
   onReady = function() {
     $('#write-form').submit(onSubmit);
-    $('#writebox textarea').keypress(onkeypress);
+    $('#writebox textarea').keyup(onEnter);
     requestTitle();
-    return titleTextBox().keypress(function(event) {
+    return titleTextBox().keyup(function(event) {
       if (event.which === 13) {
         return getTitle();
       }
