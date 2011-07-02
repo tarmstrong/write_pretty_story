@@ -2,7 +2,9 @@
   var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, titleTextBox;
   filterText = function(text) {
     var filteredText, paragraphs;
-    filteredText = text.replace('--', '&mdash;');
+    filteredText = text;
+    filteredText = filteredText.replace(/&/g, '&amp;');
+    filteredText = filteredText.replace(/--/g, '&mdash;');
     paragraphs = filteredText.split(/\n\n\n*/);
     return paragraphs;
   };

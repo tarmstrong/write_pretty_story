@@ -2,7 +2,9 @@
 # who don't want to edit what they write.
 
 filterText = (text) ->
-  filteredText = text.replace('--', '&mdash;')
+  filteredText = text
+  filteredText = filteredText.replace(/&/g, '&amp;')
+  filteredText = filteredText.replace(/--/g, '&mdash;')
 
   # split on empty line (markdown style)
   paragraphs = filteredText.split(/\n\n\n*/)
