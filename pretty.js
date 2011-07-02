@@ -1,5 +1,5 @@
 (function() {
-  var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, onEnter, onReady, onSubmit, requestTitle, showTitleRequest, titleTextBox;
+  var filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, titleTextBox;
   filterText = function(text) {
     var filteredText, paragraphs;
     filteredText = text.replace('--', '&mdash;');
@@ -27,7 +27,8 @@
   };
   onEnter = function(event) {
     if (event.which === 13) {
-      return $('#write-form').submit();
+      $('#write-form').submit();
+      return saveStory();
     }
   };
   onSubmit = function(event) {
@@ -38,8 +39,17 @@
     textArea: function() {
       return $('#writebox textarea');
     },
+    title: function() {
+      return $('h1.story-title');
+    },
     appStuff: function() {
-      return $('h1.story-title,#bd');
+      return this.title().add('#bd');
+    },
+    getTitle: function() {
+      return this.title().html();
+    },
+    setTitle: function(s) {
+      return this.title().html(s);
     },
     show: function() {
       this.appStuff().show();
@@ -47,6 +57,9 @@
     },
     hide: function() {
       return this.appStuff().hide();
+    },
+    clear: function() {
+      return $('#written-text').html('');
     }
   };
   titleTextBox = function() {
@@ -54,7 +67,7 @@
   };
   showTitleRequest = function() {
     $('#title-edit').addClass('requesting');
-    return titleTextBox().focus();
+    return titleTextBox().focus().val('');
   };
   hideTitleRequest = function() {
     return $('#title-edit').removeClass('requesting');
@@ -63,23 +76,61 @@
     var title, titleInput;
     titleInput = titleTextBox();
     title = titleInput.val();
-    $('h1.story-title').html(title);
+    mainText.setTitle(title);
     hideTitleRequest();
+    mainText.clear();
     return mainText.show();
   };
   requestTitle = function() {
     mainText.hide();
     return showTitleRequest();
   };
-  onReady = function() {
-    $('#write-form').submit(onSubmit);
-    $('#writebox textarea').keyup(onEnter);
+  saveStory = function() {
+    var paragraphs;
+    localStorage['title'] = $('h1.story-title').html();
+    paragraphs = [];
+    $('#written-text p').each(function(el, i) {
+      return paragraphs.push($(i).text());
+    });
+    return localStorage['paragraphs'] = paragraphs.join("\n\n\n");
+  };
+  restoreStory = function() {
+    var paragraphs, title;
+    title = localStorage['title'];
+    paragraphs = localStorage['paragraphs'];
+    mainText.setTitle(title);
+    if (paragraphs != null) {
+      formatNewParagraph(paragraphs);
+    }
+    return mainText.textArea().focus();
+  };
+  savedStoryExists = function() {
+    return (typeof localStorage !== "undefined" && localStorage !== null) && ((localStorage['paragraphs'] != null) || (localStorage['title'] != null));
+  };
+  newStory = function() {
     requestTitle();
     return titleTextBox().keyup(function(event) {
       if (event.which === 13) {
         return getTitle();
       }
     });
+  };
+  onReady = function() {
+    $('#write-form').submit(onSubmit);
+    $('#writebox textarea').keyup(onEnter);
+    $('#new-story').click(function(event) {
+      event.preventDefault();
+      return newStory();
+    });
+    if (Modernizr.localstorage) {
+      if (savedStoryExists()) {
+        return restoreStory();
+      } else {
+        return newStory();
+      }
+    } else {
+      return newStory();
+    }
   };
   $(document).ready(onReady);
 }).call(this);

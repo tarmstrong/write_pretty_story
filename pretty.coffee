@@ -24,6 +24,7 @@ makeNewParagraph = () ->
 onEnter = (event) ->
   if event.which is 13
     $('#write-form').submit()
+    saveStory()
 
 onSubmit = (event) ->
   event.preventDefault()
@@ -32,20 +33,28 @@ onSubmit = (event) ->
 mainText =
   textArea: () ->
     $('#writebox textarea')
+  title: () ->
+    $('h1.story-title')
   appStuff: () ->
-    $('h1.story-title,#bd')
+    @title().add('#bd')
+  getTitle: () ->
+    @title().html()
+  setTitle: (s) ->
+    @title().html(s)
   show: () ->
     @appStuff().show()
     @textArea().focus()
   hide: () ->
     @appStuff().hide()
+  clear: () ->
+    $('#written-text').html('')
 
 titleTextBox = () ->
   $('#title-edit input[name="title"]')
 
 showTitleRequest = () ->
   $('#title-edit').addClass('requesting')
-  titleTextBox().focus()
+  titleTextBox().focus().val('')
 
 hideTitleRequest = () ->
   $('#title-edit').removeClass('requesting')
@@ -53,21 +62,55 @@ hideTitleRequest = () ->
 getTitle = () ->
   titleInput = titleTextBox()
   title = titleInput.val()
-  $('h1.story-title').html(title)
+  mainText.setTitle(title)
   hideTitleRequest()
+  mainText.clear()
   mainText.show()
 
 requestTitle = () ->
   mainText.hide()
   showTitleRequest()
 
-onReady = () ->
-  $('#write-form').submit(onSubmit)
-  $('#writebox textarea').keyup(onEnter)
+saveStory = () ->
+  localStorage['title'] = $('h1.story-title').html()
+  paragraphs = []
+  $('#written-text p').each((el, i) ->
+    paragraphs.push($(i).text())
+  )
+  localStorage['paragraphs'] = paragraphs.join("\n\n\n")
+
+restoreStory = () ->
+  title = localStorage['title']
+  paragraphs = localStorage['paragraphs']
+  mainText.setTitle(title)
+  if paragraphs?
+    formatNewParagraph(paragraphs)
+  mainText.textArea().focus()
+
+savedStoryExists = () ->
+  localStorage? and (localStorage['paragraphs']? or localStorage['title']?)
+
+newStory = () ->
   requestTitle()
   titleTextBox().keyup((event) ->
     if event.which is 13
       getTitle()
   )
+
+onReady = () ->
+  $('#write-form').submit(onSubmit)
+  $('#writebox textarea').keyup(onEnter)
+  $('#new-story').click((event) ->
+    event.preventDefault()
+    newStory()
+  )
+  if Modernizr.localstorage
+    if savedStoryExists()
+      restoreStory()
+    else
+      newStory()
+  else
+    newStory()
+
 
 $(document).ready(onReady)

@@ -73,3 +73,16 @@ h1.app-title {
 p.app-description {
   margin: 14px auto;
 }
+
+#write-submit {
+  display: none;
+}
+
+ol {
+  list-style-type: armenian;
+  margin: 20px 0;
+}
+
+ol li {
+  margin: 2px 2em;
+}
