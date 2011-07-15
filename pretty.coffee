@@ -17,11 +17,21 @@ formatNewParagraph = (text) ->
     newParagraph.html(paragraph)
     $('#written-text').append(newParagraph)
 
+wordCount = (text) ->
+  text.split(' ').length
+
+syncWordCount = () ->
+  display = $('#word-count')
+  text = $('#written-text p').text()
+  wc = wordCount(text)
+  display.text(wc)
+
 makeNewParagraph = () ->
   textarea = $('#writebox textarea')
   text = textarea.val()
   formatNewParagraph(text)
   textarea.val('')
+  syncWordCount()
 
 onEnter = (event) ->
   if event.which is 13
@@ -89,6 +99,7 @@ restoreStory = () ->
   if paragraphs?
     formatNewParagraph(paragraphs)
   mainText.textArea().focus()
+  syncWordCount()
 
 savedStoryExists = () ->
   localStorage? and (localStorage['paragraphs']? or localStorage['title']?)

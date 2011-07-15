@@ -94,3 +94,8 @@ ol {
 ol li {
   margin: 2px 2em;
 }
+
+#word-count-p {
+  margin: 15px auto;
+  font-size: 10px;
+}

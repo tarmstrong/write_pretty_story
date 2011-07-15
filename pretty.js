@@ -1,5 +1,5 @@
 (function() {
-  var clearStory, filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, titleTextBox;
+  var clearStory, filterText, formatNewParagraph, getTitle, hideTitleRequest, mainText, makeNewParagraph, newStory, onEnter, onReady, onSubmit, requestTitle, restoreStory, saveStory, savedStoryExists, showTitleRequest, syncWordCount, titleTextBox, wordCount;
   filterText = function(text) {
     var filteredText, paragraphs;
     filteredText = text;
@@ -20,12 +20,23 @@
     }
     return _results;
   };
+  wordCount = function(text) {
+    return text.split(' ').length;
+  };
+  syncWordCount = function() {
+    var display, text, wc;
+    display = $('#word-count');
+    text = $('#written-text p').text();
+    wc = wordCount(text);
+    return display.text(wc);
+  };
   makeNewParagraph = function() {
     var text, textarea;
     textarea = $('#writebox textarea');
     text = textarea.val();
     formatNewParagraph(text);
-    return textarea.val('');
+    textarea.val('');
+    return syncWordCount();
   };
   onEnter = function(event) {
     if (event.which === 13) {
@@ -105,7 +116,8 @@
     if (paragraphs != null) {
       formatNewParagraph(paragraphs);
     }
-    return mainText.textArea().focus();
+    mainText.textArea().focus();
+    return syncWordCount();
   };
   savedStoryExists = function() {
     return (typeof localStorage !== "undefined" && localStorage !== null) && ((localStorage['paragraphs'] != null) || (localStorage['title'] != null));
