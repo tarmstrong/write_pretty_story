@@ -7,6 +7,14 @@ body {
   font-family: "Gentium Book", constantia, palatino;
 }
 
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
 h1 {
   text-align:center;
   font-size: 1.5em;
