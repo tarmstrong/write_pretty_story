@@ -1,15 +1,16 @@
 # write_pretty_story, a writing program for writers
 # who don't want to edit what they write.
-
 filterText = (text) ->
   filteredText = text
   filteredText = filteredText.replace(/&/g, '&amp;')
   filteredText = filteredText.replace(/--/g, '&mdash;')
 
-  # split on empty line (markdown style)
+  # Split on empty line (markdown style).
   paragraphs = filteredText.split(/\n\n\n*/)
   return paragraphs
 
+# Given a chunk of plain text, filter it
+# and print it out in the body of the page.
 formatNewParagraph = (text) ->
   paragraphs = filterText(text)
   for paragraph in paragraphs
@@ -18,14 +19,23 @@ formatNewParagraph = (text) ->
     $('#written-text').append(newParagraph)
 
 wordCount = (text) ->
-  text.split(' ').length
+  if text == ""
+    0
+  else
+    splitText = text.split(' ')
+    realSplits = (word for word in splitText when word.length > 0)
+    realSplits.length
 
+# Update the word count that appears below the write-box.
 syncWordCount = () ->
   display = $('#word-count')
+  uncommittedText = $('textarea[name=write]').val()
   text = $('#written-text p').text()
-  wc = wordCount(text)
+  wc = wordCount(text) + wordCount(uncommittedText)
   display.text(wc)
 
+# Clear the textbox and format the new paragraph
+# in the body.
 makeNewParagraph = () ->
   textarea = $('#writebox textarea')
   text = textarea.val()
@@ -33,10 +43,17 @@ makeNewParagraph = () ->
   textarea.val('')
   syncWordCount()
 
-onEnter = (event) ->
+textareaKeyUp = (event) ->
   if event.which is 13
     $('#write-form').submit()
+    h = $('#written-text p:last').height()
+    # Autoscroll so the directions, word count
+    # and uncommitted text stay in view.
+    if h
+      window.scrollBy(0, h + 50)
     saveStory()
+  else if event.which in [32, 8]
+    syncWordCount()
 
 onSubmit = (event) ->
   event.preventDefault()
@@ -92,6 +109,11 @@ saveStory = () ->
   )
   localStorage['paragraphs'] = paragraphs.join("\n\n\n")
 
+startWordCountOffset = () ->
+  rawWordCount = $('#word-count').text()
+  parsedWordCount = parseInt(rawWordCount)
+  wordCountOffset = parsedWordCount
+
 restoreStory = () ->
   title = localStorage['title']
   paragraphs = localStorage['paragraphs']
@@ -100,6 +122,7 @@ restoreStory = () ->
     formatNewParagraph(paragraphs)
   mainText.textArea().focus()
   syncWordCount()
+  startWordCountOffset()
 
 savedStoryExists = () ->
   localStorage? and (localStorage['paragraphs']? or localStorage['title']?)
@@ -120,16 +143,13 @@ newStory = () ->
 
 onReady = () ->
   $('#write-form').submit(onSubmit)
-  $('#writebox textarea').keyup(onEnter)
+  $('#writebox textarea').keyup(textareaKeyUp)
   $('#new-story').click((event) ->
     event.preventDefault()
     newStory()
   )
-  if Modernizr.localstorage
-    if savedStoryExists()
-      restoreStory()
-    else
-      newStory()
+  if Modernizr.localstorage and savedStoryExists()
+    restoreStory()
   else
     newStory()
 
